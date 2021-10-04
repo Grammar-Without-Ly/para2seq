@@ -1,10 +1,15 @@
+from nltk.tokenize import sent_tokenize
 
-f = open("text.txt", "r")
-a = f.read().split('.')
 
-b = open("text1.txt", "a")
-for seq in a:
-    b.write(seq + '\n')
-b.close()
+def main():
+    # change file name for each person then merge after
+    f = open("rawData.thang.txt", "r")
+    data = f.read()
+    correct_sentence_file = open("correctSentence.thang.txt", "a")
+    # split paragraph to sentence
+    sentences = sent_tokenize(data)
+    for sentence in sentences:
+        correct_sentence_file.write(sentence + '\n')
 
-print(b)
+
+main()
