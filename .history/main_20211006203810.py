@@ -11,6 +11,5 @@ def main():
     for sentence in sentences:
         correct_sentence_file.write(sentence + '\n')
 
-# cc
 
 main()
