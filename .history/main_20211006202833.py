@@ -8,8 +8,7 @@ def main():
     correct_sentence_file = open("correctSentence.thang.txt", "a")
     # split paragraph to sentence
     sentences = sent_tokenize(data)
-    for sentence in sentences: 
-        print(sentence)
+    for sentence in sentences:
         correct_sentence_file.write(sentence + '\n')
 
 
