@@ -1,22 +1,8 @@
 import nltk
 from nltk.tokenize import word_tokenize, sent_tokenize
-from nltk.stem import WordNetLemmatizer
-# nltk.download('wordnet')
-
-
 from nltk.stem.wordnet import WordNetLemmatizer
-
 from nltk.corpus import wordnet
-# def main():
-#     lemmatizer = WordNetLemmatizer()
-#
-#     f = open("rawData.trung.txt", "r")
-#     data = f.read()
-#     word_list = nltk.word_tokenize(data)
-#     print(word_list)
-#     # for word in word_list:
-#     #     print(WordNetLemmatizer().lemmatize(word, 'v'))
-# main()
+
 
 def get_wordnet_pos(word):
     """Map POS tag to first character lemmatize() accepts"""
@@ -37,5 +23,5 @@ sentences = sent_tokenize(lemmatized_output)
 for word in sentences:
     # x = word.split()
     # correct_sentence_file.write(word + '\n')
-    print(word)
-# print(sentences)
+    # print(word)
+    print(sentences)
