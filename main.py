@@ -10,17 +10,17 @@ def remove_space_between_words(sentence):
 def insert_random_charater(word):
     return word
 
-def connDb():
+
+def con_db():
     con = sqlite3.connect('Dictionary.db')
-    cur = con.cursor()
-    for row in cur.execute("SELECT * FROM entries "):
-        z = row[0]
-        print(z)
+    return con.cursor()
+
 
 # house
 # position = 3
 # swap_type = 1
 # hosue
+
 
 def array_to_sentence(word_array):
     return ' '.join(word_array)
@@ -41,42 +41,54 @@ def swap_character(word):
     if swap_type:
         temp = characters[position]
         characters[position] = characters[position + 1]
-        characters[position + 1]
+        characters[position + 1] = temp
         print(array_to_word(characters))
     return array_to_word(characters)
 
 
 def find_word_in_database(word):
-    return word
+    sql = """SELECT * FROM entries WHERE  lower("word") = '%s'""" % word
+    word_list = dictionary_db.execute(sql)
+    return word_list.fetchall()
+
+
+def random_number(data):
+    return random.randint(0, len(data) - 1)
 
 
 def incorrect_sentence(sentence):
     # split sentence to word
     words = sentence.split(' ')
-    i = 0
-    for word in words:
-        if word[0].isupper() and i:
-            i += i
-            break
-        # find word in database
-        # is_word_in_dictionary = find_word_in_database(word)
-        is_word_in_dictionary = True
+    is_satisfy = False
+    while not is_satisfy:
+
+        # no need to check all words in sentence
+        random_index_word = random_number(words)
+        word = words[random_index_word]
+        print(word)
+
+        # special noun
+        if word.isupper() and random_index_word != 0:
+            continue
+
+        word = word.lower()
+        is_word_in_dictionary = find_word_in_database(word)
         if is_word_in_dictionary:
-            # random_case = random.randint(0, 1)
             random_case = 1
             if random_case:
-                # print(random_case)
-                word = swap_character(word)
-                # print(word)
-            break
-        else:
-            # toschool
-            break
-    # print(words)
+                words[random_index_word] = swap_character(word)
+            else:
+                print('toschool')
+            is_satisfy = True
+        print(words)
     return array_to_sentence(words)
 
 
+dictionary_db = con_db()
+
+
 def main():
+    print('alo')
     # change file name for each person then merge after
     f = open("rawData.quang.txt", "r")
     data = f.read()
@@ -93,5 +105,4 @@ def main():
         # print(correct_sentence)
 
 
-# main()
-connDb()
+main()
