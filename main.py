@@ -64,12 +64,18 @@ class WordTypeDatabase(enum.Enum):
 def words_list_to_sentence(words_list):
     result = ''
     index_of_word = 0
+    index_of_quote = 0
     for w in words_list:
         index_of_word += 1
         if index_of_word == 1:
             result += w.capitalize()
             continue
         if set(w).difference(ascii_letters):
+            if w == '"':
+                index_of_quote += 1
+                if (index_of_quote % 2 )== 1:
+                    result += ' ' + w
+                    continue
             result += w
             continue
         result += ' ' + w
@@ -91,6 +97,8 @@ def get_wordnet_pos(word):
 def make_sentence_incorrect(sentence):
     """Make sentence incorrect"""
     text = word_tokenize(sentence)
+    if len(text) < 5:
+        return
     stemmer = SnowballStemmer('english')
     sentence_struct = {}
     for index, word in enumerate(text):
@@ -116,7 +124,6 @@ def make_sentence_incorrect(sentence):
             tried += 1
             type_to_change = list(WordTypeDatabase)[random_index_word % 4]
             if type_to_change.value != current_word['word_form']:
-                print(type_to_change.value + '----->' + current_word['word_form'])
                 break
 
         if not type_to_change:
@@ -132,20 +139,39 @@ def make_sentence_incorrect(sentence):
             type_to_change = VERB
         else:
             continue
-        test = WordNetLemmatizer().lemmatize(stemmer.stem(current_word['word']), pos=type_to_change)
-        print(current_word)
-        print({'1': test, '2': type_to_change})
+        # word_stem = stemmer.stem(current_word['word'])
+        # test = WordNetLemmatizer().lemmatize(word_stem, pos=type_to_change)
+        # if current_word['word'] == test:
+        #     continue
+        # print(current_word)
+
+        allow_word_type = ["a", "s", "r", "n", "v"]
+        forms = {}
+        # print(current_word['word'])
+        # print(current_word['word_form'].lower())
+        if current_word['word_form'].lower() not in allow_word_type:
+            continue
+        for happy_lemma in wordnet.lemmas(
+                WordNetLemmatizer().lemmatize(current_word['word'], current_word['word_form'].lower())):
+            w_form = happy_lemma.synset().pos()
+            forms[w_form] = happy_lemma.name()
+            for related_lemma in happy_lemma.derivationally_related_forms():
+                r_w_form = related_lemma.synset().pos()
+                forms[r_w_form] = related_lemma.name()
+
+        if not forms.get(type_to_change):
+            continue
+        change_word = forms.get(type_to_change)
+        if (change_word.lower() == current_word['word'].lower()) or (type_to_change.lower() == current_word['word_form'].lower()):
+            continue
+        text[random_index_word] = forms.get(type_to_change)
+        print(sentence)
+        print(current_word['word_form'] + '----->' + type_to_change)
+        # print({'word': current_word['word'], 'word_form': current_word['word_form'].lower()})
+        # print({'1': forms[type_to_change], '2': type_to_change})
+        print(current_word['word'] + '---->' + forms[type_to_change])
         print('---------------------')
-        text[random_index_word] = test
-        break
-        # for happy_lemma in wordnet.lemmas():
-        #     forms.add(happy_lemma)
-        #     for related_lemma in happy_lemma.derivationally_related_forms():
-        #         forms.add(related_lemma)
-        # for lem in forms:
-        #     print(lem)
-        # break
-    return words_list_to_sentence(text)
+        return sentence.replace(current_word['word'], forms[type_to_change])
 
 
 def main():
@@ -155,13 +181,17 @@ def main():
     correct_sentence_file = open("correctSentence.thang.txt", "a")
     # split paragraph to sentence
     sentences = sent_tokenize(data)
+    index = 0
     for sentence in sentences:
         incorrect_sentence = make_sentence_incorrect(sentence)
         if not incorrect_sentence:
-            print('---skip-----')
+            # print('---skip-----')
             continue
-        correct_sentence_file.write(sentence + '\n')
+        # correct_sentence_file.write(incorrect_sentence + '|')
+        # correct_sentence_file.write(sentence + '\n')
         correct_sentence_file.write(incorrect_sentence + '\n')
+        correct_sentence_file.write(sentence + '\n')
+        index += 1
 
 
 main()
