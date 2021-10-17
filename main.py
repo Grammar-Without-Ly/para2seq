@@ -3,101 +3,62 @@ import sqlite3
 import random
 
 from string import ascii_letters
+from nltk import pos_tag, ChartParser, CFG
 
+from nltk.stem import SnowballStemmer
+from nltk.corpus import wordnet
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.stem.wordnet import WordNetLemmatizer
 
 WORD_STRUCTURE = {
-    'n.': {
+    'N': {
         'before': {
             'special_word': [],
-            'type': []
+            'type': ['R', 'V']
         },
         'after': {
             'special_word': ['this', 'that', 'these', 'those', 'a', 'the', 'Some', 'any', 'a lot', 'many'],
-            'type': ['article.', 'pron.']
+            'type': []
         }
     },
-    'adj.': {
+    'J': {
         'before': {
             'special_word': [],
-            'type': ['n.']
+            'type': ['N']
         },
         'after': {
             'special_word': ['become', 'get', 'look', 'seem', 'find', 'smell', 'sound', 'feel', 'taste', 'stay',
                              'remain', 'keep'],
-            'type': ['i.', 'v.']  # i. is linking verb
+            'type': ['V']  # i. is linking verb
         }
     },
-    'adv.': {
+    'R': {
         'before': {
             'special_word': [],
-            'type': ['v.', 'adj.', 'adv.']
+            'type': ['V', 'J.', 'R']
         },
         'after': {
             'special_word': [],
-            'type': ['n.', 'v.']
+            'type': ['N', 'V']
         },
         'special_structure': [
             '1st_line'
         ]
     },
-    'v.': {
+    'V': {
         'after': {
             'special_word': [],
-            'type': ['n.']
+            'type': ['N']
         }
     }
 }
 
 
 class WordTypeDatabase(enum.Enum):
-    Noun = 'n.'
-    Subject = 's.'
-    Verb = 'v.'
-    Adjective = 'adj.'
-    Adverb = 'adv.'
-    Pronounce = 'pron.'
-    Article = 'article.'
-    PastParticiple = 'p. p.'  # v2
-    Etymology = 'imp.'  # v3
-
-
-class WordTypeWordNet(enum.Enum):
-    ADJ, ADJ_SAT, ADV, NOUN, VERB = "a", "s", "r", "n", "v"
-
-
-def dict_factory(cursor, row):
-    d = {}
-    for idx, col in enumerate(cursor.description):
-        d[col[0]] = row[idx]
-    return d
-
-
-def connection_db():
-    con = sqlite3.connect('Dictionary.db')
-    con.row_factory = lambda c, r: dict([(col[0], r[idx]) for idx, col in enumerate(c.description)])
-    return con.cursor()
-
-
-dictionary_db = connection_db()
-
-
-def find_words_in_db(words):
-    sql = """SELECT *  FROM entries WHERE lower(word) IN {}"""
-    cursor = dictionary_db.execute(sql.format(tuple(words)))
-    return cursor.fetchall()
-
-
-def find_word_family(word):
-    sql = """SELECT * FROM entries WHERE """
-    return
-
-
-def random_number(data=None):
-    if data:
-        return random.randint(0, len(data) - 1)
-    return random.random()
+    Noun = 'N'
+    Verb = 'V'
+    Adjective = 'J'
+    Adverb = 'R'
 
 
 def words_list_to_sentence(words_list):
@@ -114,85 +75,65 @@ def words_list_to_sentence(words_list):
     return result
 
 
+def get_wordnet_pos(word):
+    """Map POS tag to first character lemmatize() accepts"""
+    tag = pos_tag([word])[0][1][0].upper()
+    tag_dict = {"J": wordnet.ADJ,
+                "N": wordnet.NOUN,
+                "V": wordnet.VERB,
+                "R": wordnet.ADV
+                }
+
+    return tag_dict.get(tag)
+
+
 def make_sentence_incorrect(sentence):
     """Make sentence incorrect"""
-    raw_words = word_tokenize(sentence)
-    # words = [w.lower() for w in words]
-    words = []
-    for w in raw_words:
-        w = w.lower()
-        if w.find('es') == (len(w) - 2):
-            w = w.replace('es', '')
-        if w.find('s') == (len(w) - 1):
-            w = w.replace('s', '')
-        words.append(w)
-    list_words_in_dictionary = find_words_in_db(words)
-    type_group_by_word = {}
-    for w in list_words_in_dictionary:
-        raw_word = (w.get('word') or '').lower()
-        if not type_group_by_word.get(raw_word):
-            type_group_by_word[raw_word] = []
-        word_type = (w.get('wordtype') or '').split(' & ')
-        for w_type in word_type:
-            w_type = w_type.split(' ')
-            for t in w_type:
-                if t not in type_group_by_word[raw_word]:
-                    type_group_by_word[raw_word].append(t)
-
+    text = word_tokenize(sentence)
+    stemmer = SnowballStemmer('english')
+    sentence_struct = {}
+    for index, word in enumerate(text):
+        form = get_wordnet_pos(word)
+        sentence_struct[index] = {
+            'word': word,
+            'word_form': form.upper() if form else None
+        }
     while 1 != 0:
-        random_word_index = random_number(words)
-        modify_word = words[random_word_index]
-        word_types = type_group_by_word.get(modify_word)
-        if set(modify_word).difference(ascii_letters):
+        random_index_word = random.randint(0, len(text) - 1)
+        current_word = sentence_struct[random_index_word]
+        if set(current_word['word']).difference(ascii_letters) or not current_word['word_form']:
             continue
 
-        if not word_types:
-            continue
-
-        previous_word = words[random_word_index - 1]
-        if set(previous_word).difference(ascii_letters):
-            next_word = words[random_word_index + 1]
-        type_to_change = None
-        for t in word_types:
-            if not WORD_STRUCTURE.get(t):
-                continue
-            current_type = WORD_STRUCTURE[t].get('after') or {}
-            if previous_word in current_type.get('special_word'):
-                correct_type = t
-
-            number_of_find_type = 0
-            while 1 != 0:
-                if number_of_find_type > 5:
-                    break
-
-                number_of_find_type += 1
-                random_type = WordTypeDatabase(list(WordTypeDatabase)[random.randint(0, 8)])
-                if random_type not in [WordTypeDatabase.PastParticiple, WordTypeDatabase.Etymology] \
-                        and (random_type.value not in current_type['type']) and (t != random_type.value):
-                    type_to_change = random_type
-                    break
-                else:
-                    continue
-
-        if not type_to_change:
-            continue
-        if type_to_change == WordTypeDatabase.Noun:
-            type_to_change = WordTypeWordNet.NOUN.value
-        elif type_to_change == WordTypeDatabase.Verb:
-            type_to_change = WordTypeDatabase.Verb.value
+        while 1 != 0:
+            type_to_change = list(WordTypeDatabase)[random_index_word % 4]
+            if type_to_change.value != current_word['word_form']:
+                print(type_to_change.value + '----->' + current_word['word_form'])
+                break
+        ADJ, ADJ_SAT, ADV, NOUN, VERB = "a", "s", "r", "n", "v"
+        if type_to_change == WordTypeDatabase.Adjective:
+            type_to_change = ADJ
         elif type_to_change == WordTypeDatabase.Adverb:
-            type_to_change = WordTypeWordNet.ADV.value
-        elif type_to_change == WordTypeDatabase.Adjective:
-            type_to_change = WordTypeWordNet.ADJ.value
+            type_to_change = ADV
+        elif type_to_change == WordTypeDatabase.Noun:
+            type_to_change = NOUN
+        elif type_to_change == WordTypeDatabase.Verb:
+            type_to_change = VERB
         else:
             continue
-
-        print(previous_word)
-        print(WordNetLemmatizer.lemmatize('the', 'a'))
-        a = WordNetLemmatizer.lemmatize(previous_word, type_to_change)
-        print(a)
-        words[random_word_index - 1] = previous_word
-        return words_list_to_sentence(words)
+        test = WordNetLemmatizer().lemmatize(stemmer.stem(current_word['word']), pos=type_to_change)
+        print(current_word)
+        print({'1': test, '2': type_to_change})
+        print('---------------------')
+        text[random_index_word] = test
+        break
+        # for happy_lemma in wordnet.lemmas():
+        #     forms.add(happy_lemma)
+        #     for related_lemma in happy_lemma.derivationally_related_forms():
+        #         forms.add(related_lemma)
+        # for lem in forms:
+        #     print(lem)
+        # break
+    return words_list_to_sentence(text)
 
 
 def main():
@@ -203,8 +144,12 @@ def main():
     # split paragraph to sentence
     sentences = sent_tokenize(data)
     for sentence in sentences:
-        correct_sentence_file.write(sentence + '\n')
         incorrect_sentence = make_sentence_incorrect(sentence)
+        if not incorrect_sentence:
+            print('---skip-----')
+            continue
+        correct_sentence_file.write(sentence + '\n')
+        correct_sentence_file.write(incorrect_sentence + '\n')
 
 
 main()
