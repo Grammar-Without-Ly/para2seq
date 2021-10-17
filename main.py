@@ -71,6 +71,7 @@ def words_list_to_sentence(words_list):
             continue
         if set(w).difference(ascii_letters):
             result += w
+            continue
         result += ' ' + w
     return result
 
@@ -98,17 +99,28 @@ def make_sentence_incorrect(sentence):
             'word': word,
             'word_form': form.upper() if form else None
         }
+    try_time = 0
     while 1 != 0:
+        if try_time > 5:
+            return None
+        try_time += 1
         random_index_word = random.randint(0, len(text) - 1)
         current_word = sentence_struct[random_index_word]
         if set(current_word['word']).difference(ascii_letters) or not current_word['word_form']:
             continue
-
+        tried = 0
+        type_to_change = None
         while 1 != 0:
+            if tried > 5:
+                break
+            tried += 1
             type_to_change = list(WordTypeDatabase)[random_index_word % 4]
             if type_to_change.value != current_word['word_form']:
                 print(type_to_change.value + '----->' + current_word['word_form'])
                 break
+
+        if not type_to_change:
+            continue
         ADJ, ADJ_SAT, ADV, NOUN, VERB = "a", "s", "r", "n", "v"
         if type_to_change == WordTypeDatabase.Adjective:
             type_to_change = ADJ
