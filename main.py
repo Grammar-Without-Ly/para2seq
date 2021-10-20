@@ -174,9 +174,9 @@ def main():
         if incorrect_sentence_formatted:
             correct_sentence = correct_sentence.replace("\n", " ")
             # write correct sentence to file
-            formatted_data_file.write(correct_sentence + '\n')
             # ghi 1 cau sai
-            formatted_data_file.write(incorrect_sentence_formatted + '\n')
+            formatted_data_file.write(incorrect_sentence + '|')
+            formatted_data_file.write(correct_sentence + '\n')
         # print(correct_sentence)
     print(log_case)
 
