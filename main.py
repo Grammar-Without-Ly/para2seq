@@ -189,7 +189,7 @@ def main():
             continue
         # correct_sentence_file.write(incorrect_sentence + '|')
         # correct_sentence_file.write(sentence + '\n')
-        correct_sentence_file.write(incorrect_sentence + '\n')
+        correct_sentence_file.write(incorrect_sentence + '|')
         correct_sentence_file.write(sentence + '\n')
         index += 1
 
