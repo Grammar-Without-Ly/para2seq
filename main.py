@@ -73,7 +73,7 @@ def words_list_to_sentence(words_list):
         if set(w).difference(ascii_letters):
             if w == '"':
                 index_of_quote += 1
-                if (index_of_quote % 2 )== 1:
+                if (index_of_quote % 2) == 1:
                     result += ' ' + w
                     continue
             result += w
@@ -97,7 +97,7 @@ def get_wordnet_pos(word):
 def make_sentence_incorrect(sentence):
     """Make sentence incorrect"""
     text = word_tokenize(sentence)
-    if len(text) < 5:
+    if len(text) < 3:
         return
     stemmer = SnowballStemmer('english')
     sentence_struct = {}
@@ -109,7 +109,7 @@ def make_sentence_incorrect(sentence):
         }
     try_time = 0
     while 1 != 0:
-        if try_time > 5:
+        if try_time > 1000:
             return None
         try_time += 1
         random_index_word = random.randint(0, len(text) - 1)
@@ -162,7 +162,8 @@ def make_sentence_incorrect(sentence):
         if not forms.get(type_to_change):
             continue
         change_word = forms.get(type_to_change)
-        if (change_word.lower() == current_word['word'].lower()) or (type_to_change.lower() == current_word['word_form'].lower()):
+        if (change_word.lower() == current_word['word'].lower()) or (
+                type_to_change.lower() == current_word['word_form'].lower()):
             continue
         text[random_index_word] = forms.get(type_to_change)
         print(sentence)
@@ -172,6 +173,9 @@ def make_sentence_incorrect(sentence):
         print(current_word['word'] + '---->' + forms[type_to_change])
         print('---------------------')
         return sentence.replace(current_word['word'], forms[type_to_change])
+
+
+skip_sentence = []
 
 
 def main():
@@ -186,12 +190,14 @@ def main():
         incorrect_sentence = make_sentence_incorrect(sentence)
         if not incorrect_sentence:
             # print('---skip-----')
+            skip_sentence.append(sentence)
             continue
         # correct_sentence_file.write(incorrect_sentence + '|')
         # correct_sentence_file.write(sentence + '\n')
         correct_sentence_file.write(incorrect_sentence + '|')
         correct_sentence_file.write(sentence + '\n')
         index += 1
-
+    print(index)
+    print(len(skip_sentence))
 
 main()
