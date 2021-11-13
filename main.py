@@ -1,3 +1,4 @@
+import csv
 import nltk
 from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk.stem.wordnet import WordNetLemmatizer
@@ -17,48 +18,45 @@ def get_wordnet_pos(word):
 def change_structure(correct_structure):
     lemmatizer = WordNetLemmatizer()
     word_list=[lemmatizer.lemmatize(w, get_wordnet_pos(w)) for w in nltk.word_tokenize(correct_structure)]
-    lemmatized_output = ' '.join([lemmatizer.lemmatize(w) for w in word_list])
-    # sentences = sent_tokenize(lemmatized_output)
-    print(lemmatized_output)
-    return lemmatized_output
+    # print(word_list)
+    lemmatized_output =' '.join([lemmatizer.lemmatize(w) for w in word_list])
+    x = lemmatized_output.replace(' .', ". ")
+    sentences = sent_tokenize(x)
+    return x
 
 
 def para2seq():
     # change file name for each person then merge after
-    f = open("rawData.trung.txt", "r")
+    f = open("test.txt", "r")
     data = f.read()
-    correct_sentence_file = open("Correctsentence.trung.txt", "a")
     # split paragraph to sentence
     sentences = sent_tokenize(data)
     # print(sentences)
+    correct_sentence_file = open("test.csv", "a")
     for correct_structure in sentences:
-         correct_sentence_file.write(correct_structure +'\n')
-         incorrect_structure_formatted = change_structure(correct_structure)
+        incorrect_structure_formatted = change_structure(correct_structure)
+        if correct_structure != incorrect_structure_formatted:
+            correct_sentence_file.write(incorrect_structure_formatted + '|')
+            correct_sentence_file.write(correct_structure +'\n')
+        else:
+            print('No change' + correct_structure + incorrect_structure_formatted )
 
-         correct_sentence_file.write(incorrect_structure_formatted + '\n')
 
-para2seq()
-
-
-
-# def main():
+# def para2seq():
 #     # change file name for each person then merge after
 #     f = open("rawData.trung.txt", "r")
 #     data = f.read()
-#     formatted_data_file = open("Correctsentence.trung.txt", "a")
 #     # split paragraph to sentence
 #     sentences = sent_tokenize(data)
 #     # print(sentences)
-#     for correct_sentence in sentences:
-#         # write correct sentence to file
-#         formatted_data_file.write(correct_sentence + '\n')
-#         # ghi 1 cau sai
-#         incorrect_sentence_formatted = incorrect_sentence(correct_sentence)
-#         formatted_data_file.write(incorrect_sentence_formatted + '\n')
-#         # print(correct_sentence)
-#
-#
-# # cc
-#
-# main()
+#     correct_sentence_file = open("test.txt", "a")
+#     for correct_structure in sentences:
+#         incorrect_structure_formatted = change_structure(correct_structure)
+#         correct_sentence_file.write(incorrect_structure_formatted + '\t')
+#         correct_sentence_file.write(correct_structure + '\n')
+
+
+
+para2seq()
+
 

@@ -1,27 +1,40 @@
+import csv
 import nltk
 from nltk.tokenize import word_tokenize, sent_tokenize
-from nltk.stem.wordnet import WordNetLemmatizer
-from nltk.corpus import wordnet
+from nltk.tag import pos_tag
+
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize, sent_tokenize
 
 
-def get_wordnet_pos(word):
-    """Map POS tag to first character lemmatize() accepts"""
-    tag = nltk.pos_tag([word])[0][1][0].upper()
-    tag_dict = {"J": wordnet.ADJ,
-                "N": wordnet.NOUN,
-                "V": wordnet.VERB,
-                "R": wordnet.ADV}
+def ProperNounExtractor(correct_structure):
+    sentences = nltk.sent_tokenize(correct_structure)
+    text = ""
+    for sentence in sentences:
+        s = sentence
+        words = nltk.word_tokenize(sentence)
+        words = [word for word in words if word not in set(stopwords.words('english'))]
+        tagged = nltk.pos_tag(words)
+        for (word, tag) in tagged:
+            if tag == 'NNP':  # If the word is a proper noun
+                s = s.replace(str(word),str(word).lower())
+        text += s
+    return text
+def para2seq():
+    # change file name for each person then merge after
+    f = open("test.txt", "r")
+    data = f.read()
+    # split paragraph to sentence
+    sentences = sent_tokenize(data)
+    # print(sentences)
+    correct_sentence_file = open("test.csv", "a")
+    for correct_structure in sentences:
+        incorrect_ProperNoun_formatted = ProperNounExtractor(correct_structure)
+        if correct_structure != incorrect_ProperNoun_formatted:
+            correct_sentence_file.write(incorrect_ProperNoun_formatted + '|')
+            correct_sentence_file.write(correct_structure + '\n')
+        else:
+            print('No change : ' + correct_structure + incorrect_ProperNoun_formatted)
+para2seq()
 
-    return tag_dict.get(tag, wordnet.NOUN)
-lemmatizer = WordNetLemmatizer()
-f = open("rawData.trung.txt", "r")
-data = f.read()
-word_list=[lemmatizer.lemmatize(w, get_wordnet_pos(w)) for w in nltk.word_tokenize(data)]
-lemmatized_output = ' '.join([lemmatizer.lemmatize(w) for w in word_list])
-correct_sentence_file = open("Correctsentence.trung.txt", "a")
-sentences = sent_tokenize(lemmatized_output)
-for word in sentences:
-    # x = word.split()
-    # correct_sentence_file.write(word + '\n')
-    # print(word)
-    print(sentences)
+
