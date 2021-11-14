@@ -1,4 +1,3 @@
-import csv
 import nltk
 from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk.stem.wordnet import WordNetLemmatizer
@@ -15,11 +14,12 @@ def get_wordnet_pos(word):
 
     return tag_dict.get(tag, wordnet.NOUN)
 
+
 def change_structure(correct_structure):
     lemmatizer = WordNetLemmatizer()
-    word_list=[lemmatizer.lemmatize(w, get_wordnet_pos(w)) for w in nltk.word_tokenize(correct_structure)]
+    word_list = [lemmatizer.lemmatize(w, get_wordnet_pos(w)) for w in nltk.word_tokenize(correct_structure)]
     # print(word_list)
-    lemmatized_output =' '.join([lemmatizer.lemmatize(w) for w in word_list])
+    lemmatized_output = ' '.join([lemmatizer.lemmatize(w) for w in word_list])
     x = lemmatized_output.replace(' .', ". ")
     sentences = sent_tokenize(x)
     return x
@@ -37,15 +37,16 @@ def para2seq():
         incorrect_structure_formatted = change_structure(correct_structure)
         if correct_structure != incorrect_structure_formatted:
             correct_sentence_file.write(incorrect_structure_formatted + '|')
-            correct_sentence_file.write(correct_structure +'\n')
+            correct_sentence_file.write(correct_structure + '\n')
         else:
-            print('No change' + correct_structure + incorrect_structure_formatted )
+            print('No change' + correct_structure + incorrect_structure_formatted)
 
 
 # def para2seq():
 #     # change file name for each person then merge after
 #     f = open("rawData.trung.txt", "r")
 #     data = f.read()
+#     formatted_data_file = open("Correctsentence.trung.txt", "a")
 #     # split paragraph to sentence
 #     sentences = sent_tokenize(data)
 #     # print(sentences)
@@ -56,7 +57,4 @@ def para2seq():
 #         correct_sentence_file.write(correct_structure + '\n')
 
 
-
 para2seq()
-
-
