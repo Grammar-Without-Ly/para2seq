@@ -1,7 +1,11 @@
+import random
+
 import nltk
 from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.corpus import wordnet
+
+from string import ascii_letters
 
 
 def get_wordnet_pos(word):
@@ -17,13 +21,19 @@ def get_wordnet_pos(word):
 
 def change_structure(correct_structure):
     lemmatizer = WordNetLemmatizer()
-    word_list = [lemmatizer.lemmatize(w, get_wordnet_pos(w)) for w in nltk.word_tokenize(correct_structure)]
-    # print(word_list)
-    lemmatized_output = ' '.join([lemmatizer.lemmatize(w) for w in word_list])
-    x = lemmatized_output.replace(' .', ". ")
-    sentences = sent_tokenize(x)
-    return x
-
+    word_list = word_tokenize(correct_structure)
+    result = correct_structure
+    for word in word_list:
+        if set(word).difference(ascii_letters):
+            continue
+        pos_word_net = get_wordnet_pos(word)
+        if pos_word_net.lower() == 'v':
+            change_word = lemmatizer.lemmatize(word, pos_word_net)
+            if change_word != word:
+                result.replace(word, change_word)
+                print(result)
+                break
+    return result
 
 def para2seq():
     # change file name for each person then merge after
@@ -39,7 +49,7 @@ def para2seq():
             correct_sentence_file.write(incorrect_structure_formatted + '|')
             correct_sentence_file.write(correct_structure + '\n')
         else:
-            print('No change' + correct_structure + incorrect_structure_formatted)
+            print('No change\t' + correct_structure + '\t' + incorrect_structure_formatted)
 
 
 # def para2seq():
