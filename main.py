@@ -4,7 +4,6 @@ from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.corpus import wordnet
 
-
 def get_wordnet_pos(word):
     """Map POS tag to first character lemmatize() accepts"""
     tag = nltk.pos_tag([word])[0][1][0].upper()
@@ -40,7 +39,6 @@ def para2seq():
             correct_sentence_file.write(correct_structure +'\n')
         else:
             print('No change' + correct_structure + incorrect_structure_formatted )
-
 
 # def para2seq():
 #     # change file name for each person then merge after
