@@ -30,10 +30,11 @@ def change_structure(correct_structure):
         if pos_word_net.lower() == 'v':
             change_word = lemmatizer.lemmatize(word, pos_word_net)
             if change_word != word:
-                result.replace(word, change_word)
-                print(result)
+                result = result.replace(word, change_word)
+                print('Change\t' + word + '----->>>>>>' + change_word)
                 break
     return result
+
 
 def para2seq():
     # change file name for each person then merge after
