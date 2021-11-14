@@ -1,6 +1,7 @@
 import enum
 import sqlite3
 import random
+import nltk
 
 from string import ascii_letters
 from nltk import pos_tag, ChartParser, CFG
@@ -204,6 +205,7 @@ def para2seq():
     # split paragraph to sentence
     sentences = sent_tokenize(data)
     index = 0
+    correct_sentence_file = open("test.csv", "a")
     for sentence in sentences:
         incorrect_sentence = make_sentence_incorrect(sentence)
         if not incorrect_sentence:
@@ -217,4 +219,4 @@ def para2seq():
         index += 1
     print(index)
     print(len(skip_sentence))
-    
+para2seq()
