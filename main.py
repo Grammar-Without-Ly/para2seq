@@ -167,7 +167,7 @@ def make_sentence_incorrect(sentence):
                 type_to_change.lower() == current_word['word_form'].lower()):
             continue
         text[random_index_word] = forms.get(type_to_change)
-        print(sentence)
+        # print(sentence)
         print(current_word['word_form'] + '----->' + type_to_change)
         # print({'word': current_word['word'], 'word_form': current_word['word_form'].lower()})
         # print({'1': forms[type_to_change], '2': type_to_change})
@@ -213,17 +213,18 @@ def para2seq():
     # split paragraph to sentence
     sentences = sent_tokenize(data)
     index = 0
-    correct_sentence_file = open("test.csv", "a")
+    correct_sentence_file = open("test.csv", "w")
     for sentence in sentences:
         incorrect_sentence = make_sentence_incorrect(sentence)
         if not incorrect_sentence:
             # print('---skip-----')
             skip_sentence.append(sentence)
             continue
-        # correct_sentence_file.write(incorrect_sentence + '|')
-        # correct_sentence_file.write(sentence + '\n')
-        correct_sentence_file.write(incorrect_sentence + '|')
-        correct_sentence_file.write(sentence + '\n')
+        result = incorrect_sentence + '|' + 'asdasd' + sentence + '\n'
+        if result.find('|') == -1:
+            print(result)
+            continue
+        correct_sentence_file.write(result)
         index += 1
     print(index)
     print(len(skip_sentence))
