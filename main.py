@@ -1,8 +1,6 @@
 from nltk.tokenize import sent_tokenize, word_tokenize
 import sqlite3
 from string import ascii_letters
-import numpy as np
-import string
 import random
 
 
@@ -15,21 +13,6 @@ dictionary_db = con_db()
 
 
 def remove_space_between_words(words):
-    # text = 'Analysts had said they expected uncertainty about the impact on demand from variants of the coronavirus, which threaten fresh economic disruption, to weigh on OPEC+ decision-making.'
-    # words = word_tokenize(text)
-    # words = text.split()
-    # n_words = len(words)
-    # start = np.random.randint(low=0, high=n_words, size=1)[0]
-    # if start + 3 < n_words:
-    #     end = np.random.randint(low=start, high=start + 3, size=1)[0]
-    # else:
-    #     end = np.random.randint(low=start, high=n_words, size=1)[0]
-    #
-    # out = ' '.join(words[:start]) + ' ' + ''.join(words[start:end + 1]) + ' ' + ' '.join(words[end + 1:])
-
-    # print(out.strip())
-    # sentence = ' '.join(words)
-    # print(words)
     return words[0] + words[1]
 
 
@@ -91,9 +74,13 @@ def swap_character(word):
 
 
 def find_word_in_database(word):
-    sql = """SELECT * FROM entries WHERE  lower("word") = '%s'""" % word
-    word_list = dictionary_db.execute(sql)
-    return word_list.fetchall()
+    try:
+        sql = """SELECT * FROM entries WHERE  lower("word") = '%s'""" % word
+        word_list = dictionary_db.execute(sql)
+        return word_list.fetchall()
+    except Exception as e:
+        print(e)
+        return
 
 
 def random_number(data):
@@ -135,27 +122,33 @@ def incorrect_sentence(sentence):
             if random_case == 0:
                 modify_word = swap_character(word)
                 if modify_word:
-                    words[random_index_word] = modify_word
+                    # words[random_index_word] = modify_word
+                    sentence = sentence.replace(word, modify_word)
+                    print(word + '------->' + modify_word)
                 else:
                     print(sentence)
                     continue
             elif random_case == 1:
                 modify_word = insert_random_character(word)
                 if modify_word:
-                    words[random_index_word] = modify_word
+                    # words[random_index_word] = modify_word
+                    sentence = sentence.replace(word, modify_word)
+                    print(word + '------->' + modify_word)
                 else:
                     print(sentence)
                     continue
             else:
                 modify_word = remove_space_between_words([words[random_index_word - 1], word])
                 if modify_word:
-                    words[random_index_word] = modify_word
-                    del words[random_index_word - 1]
+                    # words[random_index_word] = modify_word
+                    # del words[random_index_word - 1]
+                    sentence = sentence.replace(words[random_index_word - 1] + ' ' + word, modify_word)
+                    print(words[random_index_word - 1] + ' ' + word + '------->' + modify_word)
                 else:
                     print(sentence)
                     continue
             is_satisfy = True
-    return array_to_sentence(words)
+    return sentence
 
 
 def main():
@@ -173,11 +166,7 @@ def main():
         incorrect_sentence_formatted = incorrect_sentence(correct_sentence)
         if incorrect_sentence_formatted:
             correct_sentence = correct_sentence.replace("\n", " ")
-            # write correct sentence to file
-            # ghi 1 cau sai
-            formatted_data_file.write(incorrect_sentence + '|')
-            formatted_data_file.write(correct_sentence + '\n')
-        # print(correct_sentence)
+            formatted_data_file.write(incorrect_sentence_formatted + '|' + correct_sentence + '\n')
     print(log_case)
 
 
