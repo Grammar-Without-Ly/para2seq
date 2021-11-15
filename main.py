@@ -188,14 +188,22 @@ def get_wordnet_pos(word):
 
     return tag_dict.get(tag, wordnet.NOUN)
 
+
 def change_structure(correct_structure):
     lemmatizer = WordNetLemmatizer()
-    word_list=[lemmatizer.lemmatize(w, get_wordnet_pos(w)) for w in nltk.word_tokenize(correct_structure)]
-    # print(word_list)
-    lemmatized_output =' '.join([lemmatizer.lemmatize(w) for w in word_list])
-    x = lemmatized_output.replace(' .', ". ")
-    sentences = sent_tokenize(x)
-    return x
+    word_list = word_tokenize(correct_structure)
+    result = correct_structure
+    for word in word_list:
+        if set(word).difference(ascii_letters):
+            continue
+        pos_word_net = get_wordnet_pos(word)
+        if pos_word_net.lower() == 'v':
+            change_word = lemmatizer.lemmatize(word, pos_word_net)
+            if change_word != word:
+                result = result.replace(word, change_word)
+                print('Change\t' + word + '----->>>>>>' + change_word)
+                break
+    return result
 
 
 def para2seq():
