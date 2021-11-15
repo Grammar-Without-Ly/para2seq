@@ -22,7 +22,7 @@ def ProperNounExtractor(correct_structure):
     return text
 def para2seq():
     # change file name for each person then merge after
-    f = open("test.txt", "r")
+    f = open("rawData.trung.txt", "r")
     data = f.read()
     # split paragraph to sentence
     sentences = sent_tokenize(data)
