@@ -1,6 +1,7 @@
 import enum
 import sqlite3
 import random
+import nltk
 
 from string import ascii_letters
 from nltk import pos_tag, ChartParser, CFG
@@ -177,15 +178,42 @@ def make_sentence_incorrect(sentence):
 
 skip_sentence = []
 
+def get_wordnet_pos(word):
+    """Map POS tag to first character lemmatize() accepts"""
+    tag = nltk.pos_tag([word])[0][1][0].upper()
+    tag_dict = {"J": wordnet.ADJ,
+                "N": wordnet.NOUN,
+                "V": wordnet.VERB,
+                "R": wordnet.ADV}
 
-def main():
+    return tag_dict.get(tag, wordnet.NOUN)
+
+
+def change_structure(correct_structure):
+    lemmatizer = WordNetLemmatizer()
+    word_list = word_tokenize(correct_structure)
+    result = correct_structure
+    for word in word_list:
+        if set(word).difference(ascii_letters):
+            continue
+        pos_word_net = get_wordnet_pos(word)
+        if pos_word_net.lower() == 'v':
+            change_word = lemmatizer.lemmatize(word, pos_word_net)
+            if change_word != word:
+                result = result.replace(word, change_word)
+                print('Change\t' + word + '----->>>>>>' + change_word)
+                break
+    return result
+
+
+def para2seq():
     # change file name for each person then merge after
-    f = open("rawData.thang.txt", "r")
+    f = open("rawData.trung.txt", "r")
     data = f.read()
-    correct_sentence_file = open("correctSentence.thang.txt", "a")
     # split paragraph to sentence
     sentences = sent_tokenize(data)
     index = 0
+    correct_sentence_file = open("test.csv", "a")
     for sentence in sentences:
         incorrect_sentence = make_sentence_incorrect(sentence)
         if not incorrect_sentence:
@@ -199,5 +227,4 @@ def main():
         index += 1
     print(index)
     print(len(skip_sentence))
-
-main()
+para2seq()
