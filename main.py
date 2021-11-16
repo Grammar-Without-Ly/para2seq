@@ -182,7 +182,7 @@ def main():
     # change file name for each person then merge after
     f = open("rawData.thang.txt", "r")
     data = f.read()
-    correct_sentence_file = open("correctSentence.thang.txt", "a")
+    correct_sentence_file = open("correctSentence.thang.txt", "w")
     # split paragraph to sentence
     sentences = sent_tokenize(data)
     index = 0
