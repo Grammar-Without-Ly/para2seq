@@ -155,7 +155,7 @@ def main():
     # change file name for each person then merge after
     f = open("rawData.quang.txt", "r")
     data = f.read()
-    formatted_data_file = open("formattedData.quang.txt", "a")
+    formatted_data_file = open("formattedData.quang.txt", "w")
     # split paragraph to sentence
     sentences = sent_tokenize(data)
     print(len(sentences))
