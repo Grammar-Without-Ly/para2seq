@@ -97,6 +97,8 @@ log_case = {
 def incorrect_sentence(sentence):
     # split sentence to word
     words = word_tokenize(sentence)
+    if len(words) > 32:
+         return
     is_satisfy = False
     try_time = 0
     while not is_satisfy:
