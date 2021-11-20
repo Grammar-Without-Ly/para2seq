@@ -22,6 +22,8 @@ def get_wordnet_pos(word):
 def change_structure(correct_structure):
     lemmatizer = WordNetLemmatizer()
     word_list = word_tokenize(correct_structure)
+    if len(word_list) > 32:
+        return correct_structure
     result = correct_structure
     for word in word_list:
         if set(word).difference(ascii_letters):
