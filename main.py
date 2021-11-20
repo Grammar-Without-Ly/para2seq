@@ -97,7 +97,7 @@ def get_wordnet_pos(word):
 def make_sentence_incorrect(sentence):
     """Make sentence incorrect"""
     text = word_tokenize(sentence)
-    if len(text) < 3:
+    if 3 > len(text) > 32:
         return
     stemmer = SnowballStemmer('english')
     sentence_struct = {}
