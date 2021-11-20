@@ -31,8 +31,7 @@ def para2seq():
     for correct_structure in sentences:
         incorrect_ProperNoun_formatted = ProperNounExtractor(correct_structure)
         if correct_structure != incorrect_ProperNoun_formatted:
-            correct_sentence_file.write(incorrect_ProperNoun_formatted + '|')
-            correct_sentence_file.write(correct_structure + '\n')
+            correct_sentence_file.write(incorrect_ProperNoun_formatted + '|' + correct_structure + '\n')
         else:
             print('No change : ' + correct_structure + incorrect_ProperNoun_formatted)
 para2seq()
