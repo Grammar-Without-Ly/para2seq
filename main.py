@@ -22,7 +22,8 @@ def get_wordnet_pos(word):
 def change_structure(correct_structure):
     lemmatizer = WordNetLemmatizer()
     word_list = word_tokenize(correct_structure)
-    if len(word_list) > 32:
+    print(word_list)
+    if len(word_list) < 32:
         return correct_structure
     result = correct_structure
     for word in word_list:
@@ -35,9 +36,8 @@ def change_structure(correct_structure):
                 result = result.replace(word, change_word)
                 print(result)
                 break
+    
     return result
-
-
 def para2seq():
     # change file name for each person then merge after
     f = open("rawData.trung.txt", "r")
@@ -45,7 +45,7 @@ def para2seq():
     # split paragraph to sentence
     sentences = sent_tokenize(data)
     index = 0
-    correct_sentence_file = open("test.csv", "a")
+    correct_sentence_file = open("Book1.csv", "a")
     for sentence in sentences:
         incorrect_sentence = change_structure(sentence)
         if not incorrect_sentence:

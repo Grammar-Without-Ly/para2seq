@@ -26,6 +26,8 @@ def para2seq():
     data = f.read()
     # split paragraph to sentence
     sentences = sent_tokenize(data)
+    if len(sentences) > 32:
+        return sentences
     # print(sentences)
     correct_sentence_file = open("test.csv", "a")
     for correct_structure in sentences:
