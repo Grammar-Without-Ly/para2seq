@@ -22,9 +22,8 @@ def get_wordnet_pos(word):
 def change_structure(correct_structure):
     lemmatizer = WordNetLemmatizer()
     word_list = word_tokenize(correct_structure)
-    print(word_list)
-    if len(word_list) < 32:
-        return correct_structure
+    # if len(word_list) < 32:
+    #     return correct_structure
     result = correct_structure
     for word in word_list:
         if set(word).difference(ascii_letters):
@@ -45,9 +44,10 @@ def para2seq():
     # split paragraph to sentence
     sentences = sent_tokenize(data)
     index = 0
-    correct_sentence_file = open("Book1.csv", "a")
+    correct_sentence_file = open("text.csv", "a")
     for sentence in sentences:
         incorrect_sentence = change_structure(sentence)
+        print(incorrect_sentence)
         if not incorrect_sentence:
             # print('---skip-----')
             skip_sentence.append(sentence)
