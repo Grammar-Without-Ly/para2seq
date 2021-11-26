@@ -39,7 +39,7 @@ def change_structure(correct_structure):
     return result
 def para2seq():
     # change file name for each person then merge after
-    f = open("rawData.trung.txt", "r")
+    f = open("eng.txt", "r")
     data = f.read()
     # split paragraph to sentence
     sentences = sent_tokenize(data)
@@ -47,14 +47,18 @@ def para2seq():
     correct_sentence_file = open("text.csv", "a")
     for sentence in sentences:
         incorrect_sentence = change_structure(sentence)
-        print(incorrect_sentence)
-        if not incorrect_sentence:
-            # print('---skip-----')
-            skip_sentence.append(sentence)
-            continue
-        # correct_sentence_file.write(incorrect_sentence + '|')
-        # correct_sentence_file.write(sentence + '\n')
-        correct_sentence_file.write(incorrect_sentence + '|' + sentence + '\n')
-        index += 1
-    print(index)
+
+    #     if not incorrect_sentence:
+    #         # print('---skip-----')
+    #         skip_sentence.append(sentence)
+    #         continue
+    #     # correct_sentence_file.write(incorrect_sentence + '|')
+    #     # correct_sentence_file.write(sentence + '\n')
+    #     correct_sentence_file.write(incorrect_sentence + '|' + sentence + '\n')
+    #     index += 1
+    # print(index)
+        if sentence != incorrect_sentence:
+            correct_sentence_file.write(incorrect_sentence + '|' + sentence + '\n')
+        else:
+            print('No change : ' + sentence + incorrect_sentence)
 para2seq()
