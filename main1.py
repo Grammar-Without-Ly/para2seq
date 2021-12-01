@@ -22,16 +22,16 @@ def ProperNounExtractor(correct_structure):
     return text
 def para2seq():
     # change file name for each person then merge after
-    f = open("trung.txt", "r")
+    f = open("mauengname.txt", "r")
     data = f.read()
     # split paragraph to sentence
     sentences = sent_tokenize(data)
     print(sentences)
-    correct_sentence_file = open("test.csv", "a")
+    correct_sentence_file = open("maunameeng.csv", "a")
     for correct_structure in sentences:
         incorrect_ProperNoun_formatted = ProperNounExtractor(correct_structure)
         if correct_structure != incorrect_ProperNoun_formatted:
-            correct_sentence_file.write(incorrect_ProperNoun_formatted + '|' + correct_structure + '\n')
+            correct_sentence_file.write(correct_structure + '|' + incorrect_ProperNoun_formatted + '\n')
         else:
             print('No change : ' + correct_structure + incorrect_ProperNoun_formatted)
 para2seq()

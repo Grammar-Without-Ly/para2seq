@@ -44,7 +44,7 @@ def para2seq():
     # split paragraph to sentence
     sentences = sent_tokenize(data)
     index = 0
-    correct_sentence_file = open("text.csv", "a")
+    correct_sentence_file = open("maueng.csv", "a")
     for sentence in sentences:
         incorrect_sentence = change_structure(sentence)
 
@@ -58,7 +58,7 @@ def para2seq():
     #     index += 1
     # print(index)
         if sentence != incorrect_sentence:
-            correct_sentence_file.write(incorrect_sentence + '|' + sentence + '\n')
+            correct_sentence_file.write(sentence + '|' + incorrect_sentence + '\n')
         else:
             print('No change : ' + sentence + incorrect_sentence)
 para2seq()
